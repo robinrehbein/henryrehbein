@@ -1,0 +1,22 @@
+name: segelstueck
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: segelstueck
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-segelstueck-local}
+      POSTGRES_DB: segelstueck
+    ports:
+      - "127.0.0.1:55433:5432"
+    volumes:
+      - segelstueck-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U segelstueck -d segelstueck"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  segelstueck-pgdata:
