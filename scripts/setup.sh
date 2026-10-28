@@ -31,7 +31,11 @@ sed -i.bak "s#^NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=.*#NEXT_PUBLIC_MEDUSA_PUBLISHA
 rm -f apps/storefront/.env.local.bak
 
 echo "6/6 Admin-Zugang"
-if [ ! -f .local/admin-zugang.txt ]; then
+# Decide by database state, not by the credentials file: after a database
+# reset the old file still exists but the user is gone.
+USERS=$(docker compose exec -T postgres psql -U segelstueck -d segelstueck -tAc \
+  "select count(*) from \"user\" where deleted_at is null")
+if [ "${USERS:-0}" = "0" ]; then
   mkdir -p .local
   PW=$(openssl rand -base64 18 | tr -d '/+=')
   (cd apps/backend && run npx medusa user -e admin@segelstueck.local -p "$PW")
