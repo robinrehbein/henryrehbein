@@ -1,186 +1,117 @@
-<p align="center">
-  <a href="https://www.medusajs.com">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/59018053/229103275-b5e482bb-4601-46e6-8142-244f531cebdb.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    <img alt="Medusa logo" src="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    </picture>
-  </a>
-</p>
-<h1 align="center">
-  Medusa DTC Starter
-</h1>
+# Segelstück – Demo-Shop für Taschen aus Segelstoff
 
-<h4 align="center">
-  <a href="https://docs.medusajs.com">Documentation</a> |
-  <a href="https://www.medusajs.com">Website</a>
-</h4>
+Lokaler, deutschsprachiger Shop für handgemachte Einzelstücke. Medusa 2 als Backend und
+Verwaltung, Next.js als Shop-Oberfläche, PostgreSQL als Datenbank. „Segelstück“ ist ein
+Arbeitstitel.
 
-<p align="center">
-  Building blocks for digital commerce
-</p>
-<p align="center">
-  <a href="https://github.com/medusajs/medusa/blob/develop/LICENSE">
-    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Medusa is released under the MIT license." />
-  </a>
-  <a href="https://circleci.com/gh/medusajs/medusa">
-    <img src="https://circleci.com/gh/medusajs/medusa.svg?style=shield" alt="Current CircleCI build status." />
-  </a>
-  <a href="https://github.com/medusajs/medusa/blob/develop/CONTRIBUTING.md">
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" alt="PRs welcome!" />
-  </a>
-    <a href="https://www.producthunt.com/posts/medusa"><img src="https://img.shields.io/badge/Product%20Hunt-%231%20Product%20of%20the%20Day-%23DA552E" alt="Product Hunt"></a>
-  <a href="https://discord.gg/xpCwq3Kfn8">
-    <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
-  </a>
-  <a href="https://twitter.com/intent/follow?screen_name=medusajs">
-    <img src="https://img.shields.io/twitter/follow/medusajs.svg?label=Follow%20@medusajs" alt="Follow @medusajs" />
-  </a>
-</p>
+> **Nur lokale Demo.** Testzahlung und Testversand, keine echten Zahlungen, kein Versand,
+> keine E-Mails, keine Veröffentlichung. Rechtstexte (Impressum, AGB, Datenschutz) fehlen
+> bewusst und folgen vor einem echten Verkauf.
 
-# Medusa DTC Starter
+## Voraussetzungen
 
-A production-ready monorepo starter for direct-to-consumer ecommerce stores powered by Medusa and Next.js. Includes a fully featured storefront with product browsing, cart, checkout, customer accounts, and order management.
+- Node 24 (Projekt ist per `mise.toml` und `.node-version` auf 24.18.0 festgelegt)
+- npm
+- Docker (für PostgreSQL)
 
-## Features
-
-- All of [Medusa's commerce features](https://docs.medusajs.com/resources/commerce-modules)
-- Multi-region support with automatic country detection
-- Product catalog with variant selection
-- Cart with promotion codes
-- Multi-step checkout with shipping and payment
-- Customer accounts with order history and address management
-- Order transfer between accounts
-
-## Getting Started
-
-### Deploy with Medusa Cloud
-
-The fastest way to get started is deploying with [Medusa Cloud](https://cloud.medusajs.com):
-
-1. [Create a Medusa Cloud account](https://cloud.medusajs.com)
-2. Deploy this starter directly from your dashboard
-
-### Local Installation
-
-> **Prerequisites:**
->
-> - [Node.js](https://nodejs.org/) v22.22+
-> - [PostgreSQL](https://www.postgresql.org/) v15+
-> - [pnpm](https://pnpm.io/) v10+
-
-1. Clone the repository and install dependencies:
+## Einrichten (einmalig)
 
 ```bash
-git clone https://github.com/medusajs/dtc-starter.git
-cd dtc-starter
-pnpm install
+npm run setup
 ```
 
-2. Set up environment variables for the backend:
+Das Skript startet PostgreSQL, legt die lokalen `.env`-Dateien mit zufälligen Schlüsseln an,
+führt die Migrationen aus, legt die Beispieltasche an, trägt den Publishable Key in die
+Storefront ein und erstellt einen Admin-Zugang. Die Zugangsdaten stehen danach in
+`.local/admin-zugang.txt` (nicht in Git). Das Skript kann gefahrlos erneut laufen: bestehende
+Konfiguration, Produkte, Bestellungen und der Admin bleiben erhalten.
+
+## Starten und Stoppen
 
 ```bash
-cp apps/backend/.env.template apps/backend/.env
+docker compose up -d     # Datenbank (läuft nach einem Neustart des Rechners ggf. nicht)
+npm run dev              # Backend und Shop zusammen
 ```
 
-3. Set the database URL in `apps/backend/.env`:
+| Dienst | Adresse |
+| --- | --- |
+| Shop | http://localhost:8000 |
+| Medusa-Verwaltung (Admin) | http://localhost:9000/app |
+| PostgreSQL | localhost:55433 (nur lokal) |
+
+Stoppen: `Strg+C` im Terminal, danach optional `docker compose stop`. Die Daten liegen im
+Docker-Volume `segelstueck_segelstueck-pgdata` und bleiben bei Neustarts erhalten.
+`docker compose down -v` löscht dieses Volume und damit alle Produkte und Bestellungen;
+das ist kein normaler Neustart.
+
+## Eine neue Tasche einstellen (Anleitung für die Verwaltung)
+
+Jede physische Tasche ist ein eigenes Produkt mit genau einer Variante und Bestand 1.
+
+1. http://localhost:9000/app öffnen und mit den Daten aus `.local/admin-zugang.txt` anmelden.
+2. **Products → Create** wählen.
+3. **Details:** Titel (z. B. „Segeltasche 002“), Beschreibung, Bilder hochladen.
+   Der Handle (z. B. `segeltasche-002`) wird Teil der Adresse im Shop.
+4. **Varianten:** Option z. B. „Ausführung“ mit dem Wert „Unikat“ anlegen, genau eine Variante.
+   Bei der Variante:
+   - **SKU** = Unikatnummer, z. B. `SS-002` (erscheint im Shop als „Nr. SS-002“)
+   - **Manage inventory** an
+   - **Allow backorders** aus
+   - Preis in EUR
+5. **Organisieren:** Verkaufskanal „Segelstueck Shop“ auswählen.
+6. Status **Published** und speichern.
+7. **Inventory** öffnen, die neue SKU wählen und am Standort „Werkstatt“ den Bestand auf **1**
+   setzen. Ohne Bestand erscheint die Tasche als verkauft im Archiv.
+8. Optional unter **Attributes**: Breite, Höhe, Tiefe in **cm** und Material. Unter
+   **Metadata** kann `pflege` (Pflegehinweis) und `unikat_nr` stehen. Fehlende Angaben zeigt der
+   Shop als „Angabe folgt“.
+
+Nach dem Speichern ist die Tasche sofort im Shop sichtbar. Nach einer Bestellung sinkt der
+Bestand auf 0: Die Tasche wandert ins Archiv und kann nicht erneut bestellt werden.
+
+**Beispieltasche:** `segelstueck-001` ist ein Platzhalter mit Demo-Preis und gezeichnetem Bild.
+Echtes Foto, Preis und Text im Admin ersetzen oder das Produkt löschen.
+
+## Wie der Einzelstück-Schutz funktioniert
+
+- Bestand 1, keine Nachbestellungen (`allow_backorder: false`).
+- Der Warenkorb reserviert nichts. Erst der Bestellabschluss reserviert den Bestand; Medusa
+  sperrt dabei pro Bestandsartikel, sodass von zwei gleichzeitigen Käufen nur einer gelingt.
+- Shop, Warenkorb und Kasse lesen den Bestand immer frisch aus Medusa. Ist eine Tasche
+  inzwischen verkauft, zeigt der Warenkorb einen Hinweis und sperrt die Kasse.
+- Die Schutzmechanismen sind in der lokalen Einzelprozess-Demo getestet. Für einen Betrieb mit
+  mehreren Backend-Instanzen braucht Medusa ein gemeinsames Locking (z. B. Redis); das gehört
+  zum späteren Live-Schritt.
+
+## Tests und Prüfungen
 
 ```bash
-# Replace with actual database URL, make sure the database exists.
-DATABASE_URL=postgres://postgres:@localhost:5432/medusa-dtc-starter
+npm run backend:test                      # Integrationstests (Bestand, Parallelkauf, Seed)
+cd apps/backend && npm run lint           # Medusa-Lint
+cd apps/storefront && npx tsc --noEmit    # Typecheck Shop
+cd apps/storefront && npm run build       # Produktionsbuild Shop
 ```
 
-4. Run migrations (this also seeds initial store data):
+Die Integrationstests brauchen die laufende Datenbank aus `docker compose` und legen eigene
+Testdatenbanken an (`apps/backend/.env.test`, erzeugt aus `.env.test.template`).
 
-```bash
-cd apps/backend
-pnpm medusa db:migrate
-```
+## Projektaufbau
 
-5. Add admin user:
+| Pfad | Inhalt |
+| --- | --- |
+| `apps/backend` | Medusa-Backend und Admin |
+| `apps/backend/src/migration-scripts/initial-data-seed.ts` | Grundeinrichtung: Region Deutschland, EUR, Testzahlung, Testversand, Lager „Werkstatt“ |
+| `apps/backend/src/scripts/seed-segelstueck.ts` | Beispieltasche (idempotent) |
+| `apps/backend/integration-tests/http/unique-inventory.spec.ts` | Einzelstück-Tests |
+| `apps/storefront` | Next.js-Shop |
+| `apps/storefront/src/lib/data/bags.ts` | Taschen- und Bestandsabfragen ohne Cache |
+| `apps/storefront/src/modules/segel` | Shop-eigene Bausteine |
+| `DESIGN.md` | Gestaltungssystem |
+| `docs/superpowers/` | Entwurf und Umsetzungsplan |
 
-```bash
-cd apps/backend
-pnpm medusa user -e admin@test.com -p supersecret
-```
+## Bekannte Grenzen
 
-6. Start Medusa backend:
-
-```bash
-cd apps/backend
-pnpm dev
-```
-
-7. Open the admin dashboard at `localhost:9000/app` and log in. Retrieve your publishable API key at Settings > Publishable API key.
-
-8. Set up environment variables for the storefront:
-
-```bash
-cp apps/storefront/.env.template apps/storefront/.env.local
-```
-
-9. Update `apps/storefront/.env.local` with your Medusa publishable API key:
-
-```bash
-NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_6c3...
-```
-
-10. Start the storefront:
-
-```bash
-cd apps/storefront
-pnpm dev
-```
-
-The storefront runs on `http://localhost:8000`.
-
-You can also start both the backend and storefront from the root:
-
-```bash
-pnpm dev
-```
-
-## Project Structure
-
-```text
-apps/
-├── backend/      # Medusa application: API routes, workflows, modules, admin extensions
-└── storefront/   # Next.js storefront (optional)
-```
-
-## Building with AI Agents
-
-This repo is set up for AI coding agents such as Claude Code, Cursor, and Codex:
-
-- [`AGENTS.md`](./AGENTS.md) holds the project's commands, conventions, and off-limits paths. `CLAUDE.md` points to it.
-- Installed `@medusajs/*` packages ship their own `AGENTS.md` in `node_modules`, documenting the API of the exact version you have installed.
-- Install the [Medusa agent skills](https://docs.medusajs.com/learn/introduction/build-with-llms-ai/agentic-skills) and [MCP server](https://docs.medusajs.com/learn/introduction/build-with-llms-ai/mcp-server) for documentation-backed answers:
-
-```bash
-claude mcp add --transport http medusa https://docs.medusajs.com/mcp
-```
-
-- If you deploy on [Medusa Cloud](https://cloud.medusajs.com), add the Medusa Cloud MCP server so your agent can inspect deployments, build and runtime logs, environment variables, and your store's data. It authenticates with your Medusa Cloud account:
-
-```bash
-claude mcp add --transport http medusa-cloud https://cloud.medusajs.com/mcp
-```
-
-## Configuration
-
-The storefront is configured via environment variables in `apps/storefront/.env.local`:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` | Publishable API key from your Medusa backend | — |
-| `NEXT_PUBLIC_MEDUSA_BACKEND_URL` | URL of your Medusa backend | `http://localhost:9000` |
-| `NEXT_PUBLIC_DEFAULT_REGION` | Default region country code | `dk` |
-| `NEXT_PUBLIC_BASE_URL` | Base URL of the storefront | `https://localhost:8000` |
-| `NEXT_PUBLIC_STRIPE_KEY` | Stripe publishable key (optional) | — |
-
-## Resources
-
-- [Medusa Documentation](https://docs.medusajs.com)
-- [Medusa Cloud](https://cloud.medusajs.com)
-- [Build with AI agents](https://docs.medusajs.com/learn/introduction/build-with-llms-ai)
-- [Medusa docs for LLMs (`llms.txt`)](https://docs.medusajs.com/llms.txt)
+- Kein Git-Remote eingerichtet.
+- Kundenkonten aus dem Starter sind vorhanden, aber nicht verlinkt und nicht übersetzt.
+- Einige unveränderte Starter-Dateien melden Lint-Fehler (`npm run lint` in `apps/storefront`).
+- Live-Betrieb (Zahlungsanbieter, Versand, Rechtstexte, E-Mails, Hosting) ist ein eigener Schritt.
