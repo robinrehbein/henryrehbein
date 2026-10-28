@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500" viewBox="0 0 1200 1500">
+  <rect width="1200" height="1500" fill="#F3F0E8"/>
+  <g fill="none" stroke="#111" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M300 520 L900 520 L960 1180 L240 1180 Z"/>
+    <path d="M440 520 C440 330 760 330 760 520"/>
+    <path d="M300 640 L900 640" stroke-dasharray="4 22"/>
+  </g>
+  <path d="M520 760 L520 1040 L700 1040 Z" fill="#1F4FA3"/>
+  <path d="M540 760 L720 1000" stroke="#1F4FA3" stroke-width="10"/>
+  <g font-family="Helvetica, Arial, sans-serif" fill="#111" text-anchor="middle">
+    <text x="600" y="1300" font-size="56" font-weight="700" letter-spacing="8">PLATZHALTER</text>
+    <text x="600" y="1370" font-size="34">Echtes Foto im Admin hochladen</text>
+  </g>
+</svg>

@@ -63,3 +63,4 @@ apps/backend/static/
 
 # Local credentials
 .local/
+**/.env.test

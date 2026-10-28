@@ -9,6 +9,7 @@ import {
   createRegionsWorkflow,
   createSalesChannelsWorkflow,
   createShippingOptionsWorkflow,
+  createShippingProfilesWorkflow,
   createStockLocationsWorkflow,
   createStoresWorkflow,
   createTaxRegionsWorkflow,
@@ -67,7 +68,7 @@ export default async function initial_data_seed({
     input: {
       stores: [
         {
-          name: "Segelstueck",
+          name: "Segelstück",
           supported_currencies: [{ currency_code: "eur", is_default: true }],
           default_sales_channel_id: salesChannel.id,
         },
@@ -113,11 +114,18 @@ export default async function initial_data_seed({
     [Modules.FULFILLMENT]: { fulfillment_provider_id: "manual_manual" },
   })
 
-  // Created by a core migration.
+  // Normally created by a core migration script; created here if missing
+  // (for example in integration tests, which skip migration scripts).
   const { data: shippingProfiles } = await query.graph({
     entity: "shipping_profile",
     fields: ["id"],
   })
+  if (!shippingProfiles.length) {
+    const { result } = await createShippingProfilesWorkflow(container).run({
+      input: { data: [{ name: "Default Shipping Profile", type: "default" }] },
+    })
+    shippingProfiles.push(...result)
+  }
 
   const fulfillmentSet = await fulfillmentModuleService.createFulfillmentSets({
     name: "Werkstatt Versand",
