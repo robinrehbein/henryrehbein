@@ -60,3 +60,6 @@ Thumbs.db
 
 # Medusa local uploads
 apps/backend/static/
+
+# Local credentials
+.local/

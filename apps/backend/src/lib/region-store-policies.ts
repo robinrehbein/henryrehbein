@@ -22,3 +22,9 @@ export const DEFAULT_REGION_STORE_POLICIES: RegionStorePolicies = {
   transit_days_min: 2,
   transit_days_max: 3,
 };
+
+/** Demo values for the Segelstueck region: free test shipping, no promises beyond the starter defaults. */
+export const SEGELSTUECK_REGION_POLICIES: RegionStorePolicies = {
+  ...DEFAULT_REGION_STORE_POLICIES,
+  shipping_rate: 0,
+};
