@@ -1,21 +1,22 @@
-import { retrieveCart } from "@lib/data/cart"
-import { retrieveCustomer } from "@lib/data/customer"
+import { retrieveCartWithStock } from "@lib/data/bags"
 import CartTemplate from "@modules/cart/templates"
+import BackendError from "@modules/segel/components/backend-error"
 import { Metadata } from "next"
-import { notFound } from "next/navigation"
+
+export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
-  title: "Cart",
-  description: "View your cart",
+  title: "Warenkorb",
 }
 
 export default async function Cart() {
-  const cart = await retrieveCart().catch((error) => {
-    console.error(error)
-    return notFound()
-  })
-
-  const customer = await retrieveCustomer()
-
-  return <CartTemplate cart={cart} customer={customer} />
+  const cart = await retrieveCartWithStock()
+  if (cart === "backend") {
+    return (
+      <div className="content-container py-16">
+        <BackendError reason="backend" />
+      </div>
+    )
+  }
+  return <CartTemplate cart={cart} />
 }

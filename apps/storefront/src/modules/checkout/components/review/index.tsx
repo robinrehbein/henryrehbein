@@ -32,7 +32,7 @@ const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
             }
           )}
         >
-          Review
+          Prüfen und bestellen
         </Heading>
       </div>
       {isOpen && previousStepsCompleted && (
@@ -40,10 +40,9 @@ const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
           <div className="flex items-start gap-x-1 w-full mb-6">
             <div className="w-full">
               <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                By clicking the Place Order button, you confirm that you have
-                read, understand and accept our Terms of Use, Terms of Sale and
-                Returns Policy and acknowledge that you have read Medusa
-                Store&apos;s Privacy Policy.
+                Demo-Bestellung: Mit „Testbestellung abschließen“ wird eine
+                Testbestellung angelegt. Es wird keine Zahlung ausgeführt und
+                nichts verschickt. Die Tasche gilt danach im Shop als verkauft.
               </Text>
             </div>
           </div>

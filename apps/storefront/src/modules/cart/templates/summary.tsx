@@ -1,16 +1,6 @@
-"use client"
-
-import { Button, Heading } from "@modules/common/components/ui"
-
-import CartTotals from "@modules/common/components/cart-totals"
-import Divider from "@modules/common/components/divider"
-import DiscountCode from "@modules/checkout/components/discount-code"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { HttpTypes } from "@medusajs/types"
-
-type SummaryProps = {
-  cart: HttpTypes.StoreCart
-}
+import CartTotals from "@modules/common/components/cart-totals"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 function getCheckoutStep(cart: HttpTypes.StoreCart) {
   if (!cart?.shipping_address?.address_1 || !cart.email) {
@@ -22,24 +12,29 @@ function getCheckoutStep(cart: HttpTypes.StoreCart) {
   }
 }
 
-const Summary = ({ cart }: SummaryProps) => {
-  const step = getCheckoutStep(cart)
-
+const Summary = ({ cart, blocked }: { cart: HttpTypes.StoreCart; blocked: boolean }) => {
   return (
-    <div className="flex flex-col gap-y-4">
-      <Heading level="h2" className="text-[2rem] leading-[2.75rem]">
-        Summary
-      </Heading>
-      <DiscountCode cart={cart} />
-      <Divider />
+    <aside className="border border-ink bg-papier p-6 flex flex-col gap-6 small:sticky small:top-36">
+      <h2 className="display text-3xl">Übersicht</h2>
       <CartTotals totals={cart} />
-      <LocalizedClientLink
-        href={"/checkout?step=" + step}
-        data-testid="checkout-button"
-      >
-        <Button className="w-full h-10">Go to checkout</Button>
-      </LocalizedClientLink>
-    </div>
+      {blocked ? (
+        <span className="btn-primary w-full opacity-60 cursor-not-allowed" aria-disabled="true">
+          Zur Kasse
+        </span>
+      ) : (
+        <LocalizedClientLink
+          href={"/checkout?step=" + getCheckoutStep(cart)}
+          className="btn-primary w-full"
+          data-testid="checkout-button"
+        >
+          Zur Kasse
+        </LocalizedClientLink>
+      )}
+      <p className="text-sm text-ink-soft">
+        Demo-Checkout mit Testzahlung und Testversand. Es wird nichts berechnet und nichts
+        verschickt.
+      </p>
+    </aside>
   )
 }
 

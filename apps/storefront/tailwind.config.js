@@ -20,6 +20,12 @@ module.exports = {
         padding: "padding-top padding-right padding-bottom padding-left",
       },
       colors: {
+        segel: "#F3F0E8",
+        papier: "#FBFAF6",
+        ink: "#111111",
+        "ink-soft": "#4A4A45",
+        blau: "#1F4FA3",
+        "blau-dunkel": "#173C7D",
         grey: {
           0: "#FFFFFF",
           5: "#F9FAFB",
@@ -58,16 +64,8 @@ module.exports = {
         "3xl": "2rem",
       },
       fontFamily: {
-        sans: [
-          "Inter",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "Segoe UI",
-          "Roboto",
-          "Helvetica Neue",
-          "Ubuntu",
-          "sans-serif",
-        ],
+        sans: ["var(--font-archivo)", "Helvetica Neue", "Arial", "sans-serif"],
+        mono: ["var(--font-plex-mono)", "ui-monospace", "Menlo", "monospace"],
       },
       keyframes: {
         ring: {

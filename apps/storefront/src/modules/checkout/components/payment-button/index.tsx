@@ -8,6 +8,7 @@ import { useElements, useStripe } from "@stripe/react-stripe-js"
 import { useParams } from "next/navigation"
 import React, { useState } from "react"
 import ErrorMessage from "../error-message"
+import { describeCheckoutError } from "@lib/util/bag"
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
@@ -41,7 +42,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         <ManualTestPaymentButton notReady={notReady} data-testid={dataTestId} />
       )
     default:
-      return <Button disabled>Select a payment method</Button>
+      return <Button disabled>Bitte Zahlungsart wählen</Button>
   }
 }
 
@@ -60,7 +61,7 @@ const StripePaymentButton = ({
   const onPaymentCompleted = async () => {
     await placeOrder()
       .catch((err) => {
-        setErrorMessage(err.message)
+        setErrorMessage(describeCheckoutError(err.message))
       })
       .finally(() => {
         setSubmitting(false)
@@ -146,7 +147,7 @@ const StripePaymentButton = ({
         isLoading={submitting}
         data-testid={dataTestId}
       >
-        Place order
+        Testbestellung abschließen
       </Button>
       <ErrorMessage
         error={errorMessage}
@@ -163,7 +164,7 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
   const onPaymentCompleted = async () => {
     await placeOrder()
       .catch((err) => {
-        setErrorMessage(err.message)
+        setErrorMessage(describeCheckoutError(err.message))
       })
       .finally(() => {
         setSubmitting(false)
@@ -185,7 +186,7 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
         size="large"
         data-testid="submit-order-button"
       >
-        Place order
+        Testbestellung abschließen
       </Button>
       <ErrorMessage
         error={errorMessage}
