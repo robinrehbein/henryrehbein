@@ -16,7 +16,6 @@ import {
   linkSalesChannelsToApiKeyWorkflow,
   linkSalesChannelsToStockLocationWorkflow,
 } from "@medusajs/medusa/core-flows"
-import { SEGELSTUECK_REGION_POLICIES } from "../lib/region-store-policies"
 
 /**
  * Baseline for the Segelstueck demo shop. Runs once on `medusa db:migrate`.
@@ -86,7 +85,6 @@ export default async function initial_data_seed({
           currency_code: "eur",
           countries: ["de"],
           payment_providers: ["pp_system_default"],
-          metadata: SEGELSTUECK_REGION_POLICIES,
         },
       ],
     },

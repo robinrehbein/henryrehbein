@@ -2,6 +2,8 @@ import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import type { MedusaContainer } from "@medusajs/framework/types"
 import initialDataSeed from "../../src/migration-scripts/initial-data-seed"
+import removeInventedRegionPolicies from "../../src/migration-scripts/remove-invented-region-policies"
+import { deleteProductsWorkflow, updateRegionsWorkflow } from "@medusajs/medusa/core-flows"
 import {
   SEGELSTUECK_HANDLE,
   SEGELSTUECK_SKU,
@@ -189,6 +191,52 @@ medusaIntegrationTestRunner({
       expect(again.variantId).toEqual(variantId)
       const stock = await stockOf(variantId)
       expect(stock.stocked - stock.reserved).toEqual(0)
+    })
+
+    it("the store baseline publishes no shipping or return promises", async () => {
+      const query = container().resolve(ContainerRegistrationKeys.QUERY)
+      const { data } = await query.graph({
+        entity: "region",
+        fields: ["metadata"],
+        filters: { id: regionId },
+      })
+      const metadata = data[0].metadata ?? {}
+      for (const key of ["return_window_days", "free_returns", "shipping_rate", "handling_days_min", "handling_days_max", "transit_days_min", "transit_days_max"]) {
+        expect(metadata).not.toHaveProperty(key)
+      }
+    })
+
+    it("removes previously seeded policy defaults from regions", async () => {
+      await updateRegionsWorkflow(container()).run({
+        input: {
+          selector: { id: regionId },
+          update: { metadata: { return_window_days: 30, transit_days_max: 3, eigene_notiz: "bleibt" } },
+        },
+      })
+      await removeInventedRegionPolicies({ container: container() })
+
+      const query = container().resolve(ContainerRegistrationKeys.QUERY)
+      const { data } = await query.graph({
+        entity: "region",
+        fields: ["metadata"],
+        filters: { id: regionId },
+      })
+      const metadata = data[0].metadata ?? {}
+      expect(metadata).not.toHaveProperty("return_window_days")
+      expect(metadata).not.toHaveProperty("transit_days_max")
+      expect(metadata.eigene_notiz).toEqual("bleibt")
+    })
+
+    it("re-running the seed does not bring back a deleted example bag", async () => {
+      const { productId } = await seedSegelstueck(container())
+      await deleteProductsWorkflow(container()).run({ input: { ids: [productId] } })
+
+      const again = await seedSegelstueck(container())
+      expect(again.created).toBe(false)
+
+      const productService = container().resolve(Modules.PRODUCT)
+      const live = await productService.listProducts({ handle: SEGELSTUECK_HANDLE })
+      expect(live).toHaveLength(0)
     })
   },
 })

@@ -62,7 +62,9 @@ export default function ProductTemplate({ product }: { product: HttpTypes.StoreP
             >
               {price ?? "Preis folgt"}
             </p>
-            <p className="text-sm text-ink-soft mt-1">Demo-Preis · Testversand kostenlos</p>
+            <p className="text-sm text-ink-soft mt-1">
+              {isExampleBag(product) ? "Demo-Preis · " : ""}Testversand kostenlos
+            </p>
           </div>
 
           <div className="p-6 small:p-8 border-b border-ink">

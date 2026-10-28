@@ -12,6 +12,7 @@ import type { ExecArgs, MedusaContainer } from "@medusajs/framework/types"
 import {
   ContainerRegistrationKeys,
   MedusaError,
+  Modules,
   ProductStatus,
 } from "@medusajs/framework/utils"
 import {
@@ -37,16 +38,25 @@ export async function seedSegelstueck(container: MedusaContainer): Promise<SeedR
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
   const query = container.resolve(ContainerRegistrationKeys.QUERY)
 
-  const { data: existing } = await query.graph({
-    entity: "product",
-    fields: ["id", "variants.id"],
-    filters: { handle: SEGELSTUECK_HANDLE },
-  })
-  if (existing.length) {
-    logger.info(`Segelstueck: ${SEGELSTUECK_HANDLE} exists, leaving it unchanged.`)
+  // Deleted products count too: once the example bag was removed in the Admin,
+  // re-running the setup must not bring it back as a buyable bag.
+  const productService = container.resolve(Modules.PRODUCT)
+  const existing = await productService.listProducts(
+    { handle: SEGELSTUECK_HANDLE },
+    { relations: ["variants"], withDeleted: true }
+  )
+  const existingVariants = await productService.listProductVariants(
+    { sku: SEGELSTUECK_SKU },
+    { withDeleted: true }
+  )
+  if (existing.length || existingVariants.length) {
+    const product = existing[0]
+    logger.info(
+      `Segelstueck: example bag exists or was deleted before, leaving it unchanged.`
+    )
     return {
-      productId: existing[0].id,
-      variantId: existing[0].variants[0].id,
+      productId: product?.id ?? existingVariants[0].product_id!,
+      variantId: product?.variants?.[0]?.id ?? existingVariants[0].id,
       created: false,
     }
   }

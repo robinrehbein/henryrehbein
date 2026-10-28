@@ -66,11 +66,17 @@ Jede physische Tasche ist ein eigenes Produkt mit genau einer Variante und Besta
    **Metadata** kann `pflege` (Pflegehinweis) und `unikat_nr` stehen. Fehlende Angaben zeigt der
    Shop als „Angabe folgt“.
 
-Nach dem Speichern ist die Tasche sofort im Shop sichtbar. Nach einer Bestellung sinkt der
-Bestand auf 0: Die Tasche wandert ins Archiv und kann nicht erneut bestellt werden.
+Nach dem Speichern ist die Tasche sofort im Shop sichtbar. Nach einer Bestellung ist die
+Tasche reserviert: Im Admin unter **Inventory** steht dann „Stocked 1, Reserved 1“ (verfügbar 0).
+Erst nach dem Versand (Fulfillment) sinkt der Lagerbestand auf 0. Im Shop gilt die Tasche
+sofort als verkauft, wandert ins Archiv und kann nicht erneut bestellt werden.
+**Achtung:** Wird die Bestellung im Admin storniert, wird die Reservierung frei und die Tasche
+ist wieder kaufbar.
 
 **Beispieltasche:** `segelstueck-001` ist ein Platzhalter mit Demo-Preis und gezeichnetem Bild.
-Echtes Foto, Preis und Text im Admin ersetzen oder das Produkt löschen.
+Echtes Foto, Preis und Text im Admin ersetzen oder das Produkt löschen. Ein gelöschtes
+Beispielprodukt legt `npm run setup` nicht erneut an. Die Kennzeichnung „Beispiel“ und
+„Demo-Preis“ hängt am Metadatum `beispiel: true`; für echte Taschen dieses Feld weglassen.
 
 ## Wie der Einzelstück-Schutz funktioniert
 
@@ -101,6 +107,7 @@ Testdatenbanken an (`apps/backend/.env.test`, erzeugt aus `.env.test.template`).
 | --- | --- |
 | `apps/backend` | Medusa-Backend und Admin |
 | `apps/backend/src/migration-scripts/initial-data-seed.ts` | Grundeinrichtung: Region Deutschland, EUR, Testzahlung, Testversand, Lager „Werkstatt“ |
+| `apps/backend/src/migration-scripts/remove-invented-region-policies.ts` | Entfernt unbestätigte Rückgabe- und Versandangaben des Starters |
 | `apps/backend/src/scripts/seed-segelstueck.ts` | Beispieltasche (idempotent) |
 | `apps/backend/integration-tests/http/unique-inventory.spec.ts` | Einzelstück-Tests |
 | `apps/storefront` | Next.js-Shop |
@@ -114,4 +121,6 @@ Testdatenbanken an (`apps/backend/.env.test`, erzeugt aus `.env.test.template`).
 - Kein Git-Remote eingerichtet.
 - Kundenkonten aus dem Starter sind vorhanden, aber nicht verlinkt und nicht übersetzt.
 - Einige unveränderte Starter-Dateien melden Lint-Fehler (`npm run lint` in `apps/storefront`).
+- Regionen werden in der Storefront zwischengespeichert. Nach Änderungen an Regionen im Admin
+  den Shop neu starten.
 - Live-Betrieb (Zahlungsanbieter, Versand, Rechtstexte, E-Mails, Hosting) ist ein eigener Schritt.
