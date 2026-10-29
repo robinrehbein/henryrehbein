@@ -28,8 +28,15 @@ export const SEGELSTUECK_SKU = "SS-001"
 const DEMO_PRICE_EUR = 89
 
 const DESCRIPTION = [
-  "Beispielprodukt für die Demo. Preis und Text sind Platzhalter und werden im Admin durch echte Angaben ersetzt.",
-  "Handgemachte Tasche aus Segelstoff. Jede Tasche ist ein Einzelstück und genau einmal erhältlich.",
+  "Gedacht als Everyday Bag für die Uni, das Büro oder kurze Ausflüge in die Stadt – immer dann, wenn man etwas mehr Stauraum braucht.",
+  "Der Brustgurt ist verstellbar, so lässt sich die Höhe anpassen. Ein Bauchgurt sorgt dafür, dass die Tasche auf dem Fahrrad immer auf dem Rücken bleibt.",
+  [
+    "– Maße 30 × 25 × 11 cm",
+    "– Verstellbare Gurte",
+    "– Extrafach für Ladekabel, Stifte etc.",
+    "– Extrafach z. B. für ein iPad",
+  ].join("\n"),
+  "Handgemacht aus Segelstoff. Jede Tasche ist ein Einzelstück und genau einmal erhältlich.",
 ].join("\n\n")
 
 export type SeedResult = { productId: string; variantId: string; created: boolean }
