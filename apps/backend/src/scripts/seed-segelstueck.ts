@@ -6,7 +6,7 @@
  * Idempotent: if a product with the handle already exists, nothing is changed.
  * In particular a sold bag is never restocked by running this again.
  */
-import { readFileSync } from "fs"
+import { readdirSync, readFileSync } from "fs"
 import path from "path"
 import type { ExecArgs, MedusaContainer } from "@medusajs/framework/types"
 import {
@@ -28,7 +28,7 @@ export const SEGELSTUECK_SKU = "SS-001"
 const DEMO_PRICE_EUR = 89
 
 const DESCRIPTION = [
-  "Beispielprodukt für die lokale Demo. Bild, Preis und Text sind Platzhalter und werden im Admin durch echte Angaben ersetzt.",
+  "Beispielprodukt für die lokale Demo. Preis und Text sind Platzhalter und werden im Admin durch echte Angaben ersetzt.",
   "Handgemachte Tasche aus Segelstoff. Jede Tasche ist ein Einzelstück und genau einmal erhältlich.",
 ].join("\n\n")
 
@@ -79,17 +79,16 @@ export async function seedSegelstueck(container: MedusaContainer): Promise<SeedR
     )
   }
 
-  const image = readFileSync(path.join(__dirname, "assets", "platzhalter.png"))
+  const imageDir = path.join(__dirname, "assets", "segeltasche-001")
+  const imageFiles = readdirSync(imageDir).filter((f) => f.endsWith(".jpg")).sort()
   const { result: files } = await uploadFilesWorkflow(container).run({
     input: {
-      files: [
-        {
-          filename: "segelstueck-001-platzhalter.png",
-          mimeType: "image/png",
-          content: image.toString("base64"),
-          access: "public",
-        },
-      ],
+      files: imageFiles.map((f) => ({
+        filename: `segelstueck-001-${f}`,
+        mimeType: "image/jpeg",
+        content: readFileSync(path.join(imageDir, f)).toString("base64"),
+        access: "public" as const,
+      })),
     },
   })
 
@@ -107,7 +106,7 @@ export async function seedSegelstueck(container: MedusaContainer): Promise<SeedR
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfiles[0].id,
           thumbnail: files[0].url,
-          images: [{ url: files[0].url }],
+          images: files.map((f) => ({ url: f.url })),
           sales_channels: salesChannels.map((sc) => ({ id: sc.id })),
           metadata: { unikat_nr: SEGELSTUECK_SKU, beispiel: true },
           options: [{ title: "Ausführung", values: ["Unikat"] }],

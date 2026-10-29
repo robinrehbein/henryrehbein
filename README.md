@@ -73,8 +73,8 @@ sofort als verkauft, wandert ins Archiv und kann nicht erneut bestellt werden.
 **Achtung:** Wird die Bestellung im Admin storniert, wird die Reservierung frei und die Tasche
 ist wieder kaufbar.
 
-**Beispieltasche:** `segelstueck-001` ist ein Platzhalter mit Demo-Preis und gezeichnetem Bild.
-Echtes Foto, Preis und Text im Admin ersetzen oder das Produkt löschen. Ein gelöschtes
+**Beispieltasche:** `segelstueck-001` zeigt echte Fotos einer Tasche, Preis und Text sind aber Platzhalter.
+Preis und Text im Admin ersetzen oder das Produkt löschen. Ein gelöschtes
 Beispielprodukt legt `npm run setup` nicht erneut an. Die Kennzeichnung „Beispiel“ und
 „Demo-Preis“ hängt am Metadatum `beispiel: true`; für echte Taschen dieses Feld weglassen.
 
