@@ -43,7 +43,7 @@ export default async function Home(props: { params: Promise<{ countryCode: strin
   return (
     <>
       <section className="border-b border-ink">
-        <div className="content-container !px-0 small:!px-8 grid grid-cols-1 small:grid-cols-2 small:border-x border-ink">
+        <div className="content-container !px-0 grid grid-cols-1 small:grid-cols-2 small:border-x border-ink">
           <div className="relative aspect-[4/5] small:aspect-auto small:min-h-[640px] bg-papier border-b small:border-b-0 small:border-r border-ink">
             {heroBag?.thumbnail ? (
               <Image
