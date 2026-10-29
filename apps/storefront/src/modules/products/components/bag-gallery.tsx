@@ -7,10 +7,13 @@ export default function BagGallery({
   images,
   title,
   sold,
+  aiViews = false,
 }: {
   images: string[]
   title: string
   sold: boolean
+  /** Photos after the first are AI-generated; say so under the strip. */
+  aiViews?: boolean
 }) {
   const [active, setActive] = useState(0)
 
@@ -55,6 +58,11 @@ export default function BagGallery({
             </li>
           ))}
         </ul>
+      )}
+      {aiViews && images.length > 1 && (
+        <p className="label text-ink-soft px-4 py-2 border-t border-ink">
+          Erstes Foto echt · weitere Ansichten KI-generiert
+        </p>
       )}
     </div>
   )

@@ -5,6 +5,7 @@ import initialDataSeed from "../../src/migration-scripts/initial-data-seed"
 import removeInventedRegionPolicies from "../../src/migration-scripts/remove-invented-region-policies"
 import { deleteProductsWorkflow, updateRegionsWorkflow } from "@medusajs/medusa/core-flows"
 import {
+  SEGELSTUECK_BAGS,
   SEGELSTUECK_HANDLE,
   SEGELSTUECK_SKU,
   seedSegelstueck,
@@ -237,6 +238,25 @@ medusaIntegrationTestRunner({
       const productService = container().resolve(Modules.PRODUCT)
       const live = await productService.listProducts({ handle: SEGELSTUECK_HANDLE })
       expect(live).toHaveLength(0)
+    })
+
+    it("seeds every catalogue bag exactly once with stock 1 and its photos", async () => {
+      await seedSegelstueck(container())
+      await seedSegelstueck(container())
+
+      expect(SEGELSTUECK_BAGS.length).toBeGreaterThan(1)
+      const productService = container().resolve(Modules.PRODUCT)
+      for (const bag of SEGELSTUECK_BAGS) {
+        const products = await productService.listProducts(
+          { handle: bag.handle },
+          { relations: ["variants", "images"] }
+        )
+        expect(products).toHaveLength(1)
+        expect(products[0].variants[0].sku).toEqual(bag.sku)
+        expect(products[0].images.length).toBeGreaterThan(1)
+        expect(products[0].metadata?.ki_ansichten ?? false).toEqual(bag.kiAnsichten)
+        expect(await stockOf(products[0].variants[0].id)).toEqual({ stocked: 1, reserved: 0 })
+      }
     })
 
     it("hands the storefront container its publishable key without auth", async () => {

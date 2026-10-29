@@ -7,6 +7,7 @@ import {
   bagPrice,
   isBagSold,
   isExampleBag,
+  hasAiViews,
 } from "@lib/util/bag"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import BagActions from "@modules/products/components/bag-actions"
@@ -38,7 +39,12 @@ export default function ProductTemplate({ product }: { product: HttpTypes.StoreP
       </nav>
 
       <div className="grid grid-cols-1 small:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] border-y small:border border-ink">
-        <BagGallery images={bagImages(product)} title={product.title ?? "Tasche"} sold={sold} />
+        <BagGallery
+          images={bagImages(product)}
+          title={product.title ?? "Tasche"}
+          sold={sold}
+          aiViews={hasAiViews(product)}
+        />
 
         <div className="flex flex-col border-t small:border-t-0 small:border-l border-ink">
           <div className="p-6 small:p-8 border-b border-ink">
@@ -80,15 +86,6 @@ export default function ProductTemplate({ product }: { product: HttpTypes.StoreP
             )}
           </div>
 
-          {product.description && (
-            <div className="p-6 small:p-8 border-b border-ink">
-              <h2 className="label text-ink-soft mb-3">Beschreibung</h2>
-              <p className="leading-7 whitespace-pre-line" data-testid="product-description">
-                {product.description}
-              </p>
-            </div>
-          )}
-
           <dl className="grid grid-cols-[auto_1fr]">
             {details.map((d, i) => (
               <div key={d.label} className={`contents`}>
@@ -109,6 +106,16 @@ export default function ProductTemplate({ product }: { product: HttpTypes.StoreP
           </dl>
         </div>
       </div>
+
+      {/* Full width below the grid, so a long text does not stretch the photo column. */}
+      {product.description && (
+        <div className="p-6 small:p-8 border-b small:border-x border-ink">
+          <h2 className="label text-ink-soft mb-3">Beschreibung</h2>
+          <p className="leading-7 whitespace-pre-line max-w-2xl" data-testid="product-description">
+            {product.description}
+          </p>
+        </div>
+      )}
     </div>
   )
 }

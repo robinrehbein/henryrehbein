@@ -28,6 +28,10 @@ export const bagNumber = (bag: HttpTypes.StoreProduct) => {
 export const isExampleBag = (bag: HttpTypes.StoreProduct) =>
   bag.metadata?.beispiel === true || bag.metadata?.beispiel === "true"
 
+/** True when the photos after the first are AI-generated views (metadata.ki_ansichten). */
+export const hasAiViews = (bag: HttpTypes.StoreProduct) =>
+  bag.metadata?.ki_ansichten === true || bag.metadata?.ki_ansichten === "true"
+
 export const bagPrice = (bag: HttpTypes.StoreProduct) => {
   const price = bagVariant(bag)?.calculated_price
   if (!price || price.calculated_amount == null || !price.currency_code) {

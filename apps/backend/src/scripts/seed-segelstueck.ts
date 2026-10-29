@@ -1,10 +1,11 @@
 /**
- * Creates the single example bag for the local demo shop.
+ * Creates the demo catalogue of bags, each a unique piece with stock 1.
  *
  *   npx medusa exec ./src/scripts/seed-segelstueck.ts
  *
- * Idempotent: if a product with the handle already exists, nothing is changed.
- * In particular a sold bag is never restocked by running this again.
+ * Idempotent per bag: if a product with the handle or SKU already exists (or
+ * existed and was deleted), that bag is left unchanged. In particular a sold
+ * bag is never restocked by running this again.
  */
 import { readdirSync, readFileSync } from "fs"
 import path from "path"
@@ -24,6 +25,34 @@ import {
 export const SEGELSTUECK_HANDLE = "segelstueck-001"
 export const SEGELSTUECK_SKU = "SS-001"
 
+type BagSpec = {
+  nr: string
+  /** Motif on the flap, as a short German name. */
+  motiv: string
+  /** Light bags have a natural strap and a phone pocket; dark ones navy and none. */
+  ausfuehrung: "hell" | "dunkel"
+  /** True when the extra views are AI-generated from the real front photo. */
+  kiAnsichten: boolean
+}
+
+const BAG_SPECS: BagSpec[] = [
+  { nr: "001", motiv: "Blaues L", ausfuehrung: "hell", kiAnsichten: false },
+  { nr: "002", motiv: "Rote Schräge", ausfuehrung: "dunkel", kiAnsichten: true },
+  { nr: "003", motiv: "Rotes Fünfeck", ausfuehrung: "dunkel", kiAnsichten: true },
+  { nr: "004", motiv: "Blaues E", ausfuehrung: "dunkel", kiAnsichten: true },
+  { nr: "005", motiv: "Rotes Dreieck", ausfuehrung: "hell", kiAnsichten: true },
+  { nr: "006", motiv: "Rote Neun", ausfuehrung: "dunkel", kiAnsichten: true },
+]
+
+export const SEGELSTUECK_BAGS = BAG_SPECS.map((spec) => ({
+  ...spec,
+  handle: `segelstueck-${spec.nr}`,
+  sku: `SS-${spec.nr}`,
+  title: `Segeltasche ${spec.nr}`,
+  imageDir: `segeltasche-${spec.nr}`,
+}))
+type Bag = (typeof SEGELSTUECK_BAGS)[number]
+
 /** Demo price in EUR. Not a confirmed price; change it in the Admin. */
 const DEMO_PRICE_EUR = 89
 
@@ -41,7 +70,16 @@ const DESCRIPTION = [
 
 export type SeedResult = { productId: string; variantId: string; created: boolean }
 
+/** Seeds every bag of the catalogue; returns the result for Segeltasche 001. */
 export async function seedSegelstueck(container: MedusaContainer): Promise<SeedResult> {
+  const results: SeedResult[] = []
+  for (const bag of SEGELSTUECK_BAGS) {
+    results.push(await seedBag(container, bag))
+  }
+  return results[0]
+}
+
+async function seedBag(container: MedusaContainer, bag: Bag): Promise<SeedResult> {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
   const query = container.resolve(ContainerRegistrationKeys.QUERY)
 
@@ -49,17 +87,17 @@ export async function seedSegelstueck(container: MedusaContainer): Promise<SeedR
   // re-running the setup must not bring it back as a buyable bag.
   const productService = container.resolve(Modules.PRODUCT)
   const existing = await productService.listProducts(
-    { handle: SEGELSTUECK_HANDLE },
+    { handle: bag.handle },
     { relations: ["variants"], withDeleted: true }
   )
   const existingVariants = await productService.listProductVariants(
-    { sku: SEGELSTUECK_SKU },
+    { sku: bag.sku },
     { withDeleted: true }
   )
   if (existing.length || existingVariants.length) {
     const product = existing[0]
     logger.info(
-      `Segelstueck: example bag exists or was deleted before, leaving it unchanged.`
+      `Segelstueck: ${bag.handle} exists or was deleted before, leaving it unchanged.`
     )
     return {
       productId: product?.id ?? existingVariants[0].product_id!,
@@ -88,12 +126,12 @@ export async function seedSegelstueck(container: MedusaContainer): Promise<SeedR
     )
   }
 
-  const imageDir = path.join(__dirname, "assets", "segeltasche-001")
+  const imageDir = path.join(__dirname, "assets", bag.imageDir)
   const imageFiles = readdirSync(imageDir).filter((f) => f.endsWith(".jpg")).sort()
   const { result: files } = await uploadFilesWorkflow(container).run({
     input: {
       files: imageFiles.map((f) => ({
-        filename: `segelstueck-001-${f}`,
+        filename: `${bag.handle}-${f}`,
         mimeType: "image/jpeg",
         content: readFileSync(path.join(imageDir, f)).toString("base64"),
         access: "public" as const,
@@ -107,9 +145,9 @@ export async function seedSegelstueck(container: MedusaContainer): Promise<SeedR
     input: {
       products: [
         {
-          title: "Segeltasche 001",
+          title: bag.title,
           subtitle: "Beispiel",
-          handle: SEGELSTUECK_HANDLE,
+          handle: bag.handle,
           description: DESCRIPTION,
           material: "Segelstoff",
           // Breite × Höhe × Tiefe in cm, as measured on the bag.
@@ -121,12 +159,18 @@ export async function seedSegelstueck(container: MedusaContainer): Promise<SeedR
           thumbnail: files[0].url,
           images: files.map((f) => ({ url: f.url })),
           sales_channels: salesChannels.map((sc) => ({ id: sc.id })),
-          metadata: { unikat_nr: SEGELSTUECK_SKU, beispiel: true },
+          metadata: {
+            unikat_nr: bag.sku,
+            beispiel: true,
+            motiv: bag.motiv,
+            ausfuehrung: bag.ausfuehrung,
+            ...(bag.kiAnsichten ? { ki_ansichten: true } : {}),
+          },
           options: [{ title: "Ausführung", values: ["Unikat"] }],
           variants: [
             {
               title: "Unikat",
-              sku: SEGELSTUECK_SKU,
+              sku: bag.sku,
               manage_inventory: true,
               allow_backorder: false,
               options: { "Ausführung": "Unikat" },
@@ -157,7 +201,7 @@ export async function seedSegelstueck(container: MedusaContainer): Promise<SeedR
     },
   })
 
-  logger.info(`Segelstueck: created ${SEGELSTUECK_HANDLE} (${SEGELSTUECK_SKU}) with stock 1.`)
+  logger.info(`Segelstueck: created ${bag.handle} (${bag.sku}) with stock 1.`)
   return { productId: product.id, variantId: variant.id, created: true }
 }
 
