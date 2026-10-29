@@ -1,4 +1,5 @@
 "use client"
+import { countryName } from "@lib/util/country-name"
 import { Radio, RadioGroup } from "@headlessui/react"
 import { setShippingMethod } from "@lib/data/cart"
 import { calculatePriceForShippingOption } from "@lib/data/fulfillment"
@@ -40,7 +41,7 @@ function formatAddress(address: HttpTypes.StoreCartAddress) {
   }
 
   if (address.country_code) {
-    ret += `, ${address.country_code.toUpperCase()}`
+    ret += `, ${countryName(address.country_code)}`
   }
 
   return ret
@@ -152,7 +153,7 @@ const Shipping: React.FC<ShippingProps> = ({
   }, [isOpen])
 
   return (
-    <div className="bg-white">
+    <div>
       <div className="flex flex-row items-center justify-between mb-6">
         <Heading
           level="h2"
@@ -387,7 +388,7 @@ const Shipping: React.FC<ShippingProps> = ({
         <div>
           <div className="text-small-regular">
             {cart && (cart.shipping_methods?.length ?? 0) > 0 && (
-              <div className="flex flex-col w-1/3">
+              <div className="flex flex-col small:w-1/3 min-w-0 break-words">
                 <Text className="txt-medium-plus text-ui-fg-base mb-1">
                   Versandart
                 </Text>

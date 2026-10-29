@@ -111,7 +111,7 @@ const Payment = ({
   }, [isOpen])
 
   return (
-    <div className="bg-white">
+    <div>
       <div className="flex flex-row items-center justify-between mb-6">
         <Heading
           level="h2"
@@ -170,7 +170,7 @@ const Payment = ({
           )}
 
           {paidByGiftcard && (
-            <div className="flex flex-col w-1/3">
+            <div className="flex flex-col small:w-1/3 min-w-0 break-words">
               <Text className="txt-medium-plus text-ui-fg-base mb-1">
                 Zahlungsart
               </Text>
@@ -207,8 +207,8 @@ const Payment = ({
 
         <div className={isOpen ? "hidden" : "block"}>
           {cart && paymentReady && activeSession ? (
-            <div className="flex items-start gap-x-1 w-full">
-              <div className="flex flex-col w-1/3">
+            <div className="flex flex-col small:flex-row items-start gap-6 small:gap-x-1 w-full">
+              <div className="flex flex-col small:w-1/3 min-w-0 break-words">
                 <Text className="txt-medium-plus text-ui-fg-base mb-1">
                   Zahlungsart
                 </Text>
@@ -220,7 +220,7 @@ const Payment = ({
                     activeSession?.provider_id}
                 </Text>
               </div>
-              <div className="flex flex-col w-1/3">
+              <div className="flex flex-col small:w-1/3 min-w-0 break-words">
                 <Text className="txt-medium-plus text-ui-fg-base mb-1">
                   Zahlungsdetails
                 </Text>
@@ -238,7 +238,7 @@ const Payment = ({
               </div>
             </div>
           ) : paidByGiftcard ? (
-            <div className="flex flex-col w-1/3">
+            <div className="flex flex-col small:w-1/3 min-w-0 break-words">
               <Text className="txt-medium-plus text-ui-fg-base mb-1">
                 Zahlungsart
               </Text>

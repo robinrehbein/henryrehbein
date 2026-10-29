@@ -10,7 +10,7 @@ const CountrySelect = forwardRef<
   NativeSelectProps & {
     region?: HttpTypes.StoreRegion
   }
->(({ placeholder = "Country", region, defaultValue, ...props }, ref) => {
+>(({ placeholder = "Land", region, defaultValue, ...props }, ref) => {
   const innerRef = useRef<HTMLSelectElement>(null)
 
   useImperativeHandle<HTMLSelectElement | null, HTMLSelectElement | null>(
@@ -23,9 +23,13 @@ const CountrySelect = forwardRef<
       return []
     }
 
+    // Medusa stores English country names; show them in German.
+    const names = new Intl.DisplayNames(["de"], { type: "region" })
     return region.countries?.map((country) => ({
       value: country.iso_2,
-      label: country.display_name,
+      label: country.iso_2
+        ? names.of(country.iso_2.toUpperCase()) ?? country.display_name
+        : country.display_name,
     }))
   }, [region])
 

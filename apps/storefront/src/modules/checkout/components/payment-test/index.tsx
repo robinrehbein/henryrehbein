@@ -1,10 +1,10 @@
-import { Badge } from "@modules/common/components/ui"
+import { clx } from "@modules/common/components/ui"
 
 const PaymentTest = ({ className }: { className?: string }) => {
   return (
-    <Badge color="orange" className={className}>
-      <span className="font-semibold">Hinweis:</span> Nur zu Testzwecken.
-    </Badge>
+    <span className={clx("label inline-block bg-blau text-papier px-2 py-1", className)}>
+      Nur zu Testzwecken
+    </span>
   )
 }
 

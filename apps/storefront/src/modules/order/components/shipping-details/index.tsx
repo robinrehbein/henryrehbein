@@ -1,3 +1,4 @@
+import { countryName } from "@lib/util/country-name"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
 import { Heading, Text } from "@modules/common/components/ui"
@@ -14,9 +15,9 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
       <Heading level="h2" className="flex flex-row text-3xl-regular my-6">
         Versand
       </Heading>
-      <div className="flex items-start gap-x-8">
+      <div className="flex flex-col small:flex-row items-start gap-6 small:gap-x-8">
         <div
-          className="flex flex-col w-1/3"
+          className="flex flex-col small:w-1/3 min-w-0 break-words"
           data-testid="shipping-address-summary"
         >
           <Text className="txt-medium-plus text-ui-fg-base mb-1">
@@ -35,12 +36,12 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
             {order.shipping_address?.city}
           </Text>
           <Text className="txt-medium text-ui-fg-subtle">
-            {order.shipping_address?.country_code?.toUpperCase()}
+            {countryName(order.shipping_address?.country_code)}
           </Text>
         </div>
 
         <div
-          className="flex flex-col w-1/3 "
+          className="flex flex-col small:w-1/3 min-w-0 break-words "
           data-testid="shipping-contact-summary"
         >
           <Text className="txt-medium-plus text-ui-fg-base mb-1">Kontakt</Text>
@@ -51,7 +52,7 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
         </div>
 
         <div
-          className="flex flex-col w-1/3"
+          className="flex flex-col small:w-1/3 min-w-0 break-words"
           data-testid="shipping-method-summary"
         >
           <Text className="txt-medium-plus text-ui-fg-base mb-1">Versandart</Text>
