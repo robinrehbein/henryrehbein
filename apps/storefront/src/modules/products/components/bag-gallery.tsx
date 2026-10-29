@@ -16,7 +16,7 @@ export default function BagGallery({
 
   if (!images.length) {
     return (
-      <div className="aspect-[4/5] bg-papier flex items-center justify-center label text-ink-soft">
+      <div className="aspect-[4/3] bg-papier flex items-center justify-center label text-ink-soft">
         Kein Bild hinterlegt
       </div>
     )
@@ -24,7 +24,7 @@ export default function BagGallery({
 
   return (
     <div className="flex flex-col">
-      <div className="relative aspect-[4/5] bg-papier">
+      <div className="relative aspect-[4/3] bg-papier">
         <Image
           src={images[active]}
           alt={`${title}, Ansicht ${active + 1} von ${images.length}`}
@@ -35,16 +35,18 @@ export default function BagGallery({
         />
       </div>
       {images.length > 1 && (
-        <ul className="grid grid-cols-4 small:grid-cols-6 gap-px bg-ink border-t border-ink" aria-label="Ansichten">
+        <ul className="flex overflow-x-auto overscroll-x-contain snap-x border-y border-ink [scrollbar-width:thin] [scrollbar-color:theme(colors.ink)_transparent]" aria-label="Ansichten">
           {images.map((url, i) => (
-            <li key={url} className="bg-segel">
+            <li key={url} className="shrink-0 w-24 small:w-32 snap-start bg-segel border-r border-ink">
               <button
                 type="button"
                 onClick={() => setActive(i)}
                 aria-label={`Ansicht ${i + 1} zeigen`}
                 aria-pressed={i === active}
-                className={`relative block w-full aspect-square ${
-                  i === active ? "outline outline-3 outline-blau -outline-offset-[3px]" : "opacity-80 hover:opacity-100"
+                className={`relative block w-full aspect-square focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-ink ${
+                  i === active
+                    ? "after:absolute after:inset-0 after:border-[3px] after:border-blau"
+                    : "opacity-80 hover:opacity-100"
                 }`}
               >
                 <Image src={url} alt="" fill sizes="120px" className="object-cover" />

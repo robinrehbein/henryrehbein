@@ -37,7 +37,7 @@ export default function ProductTemplate({ product }: { product: HttpTypes.StoreP
         <span>{number ? `Nr. ${number}` : product.title}</span>
       </nav>
 
-      <div className="grid grid-cols-1 small:grid-cols-[3fr_2fr] border-y small:border border-ink">
+      <div className="grid grid-cols-1 small:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] border-y small:border border-ink">
         <BagGallery images={bagImages(product)} title={product.title ?? "Tasche"} sold={sold} />
 
         <div className="flex flex-col border-t small:border-t-0 small:border-l border-ink">
