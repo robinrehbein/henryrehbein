@@ -23,8 +23,9 @@ export default function BagGallery({
   }
 
   return (
-    <div className="flex flex-col">
-      <div className="relative aspect-[4/3] bg-papier">
+    <div className="flex flex-col h-full">
+      {/* Desktop: the photo grows to fill the row, the strip sits on the bottom border. */}
+      <div className="relative aspect-[4/3] small:aspect-auto small:flex-1 small:min-h-[420px] bg-papier">
         <Image
           src={images[active]}
           alt={`${title}, Ansicht ${active + 1} von ${images.length}`}
@@ -35,7 +36,7 @@ export default function BagGallery({
         />
       </div>
       {images.length > 1 && (
-        <ul className="flex overflow-x-auto overscroll-x-contain snap-x border-y border-ink [scrollbar-width:thin] [scrollbar-color:theme(colors.ink)_transparent]" aria-label="Ansichten">
+        <ul className="flex overflow-x-auto overscroll-x-contain snap-x border-y small:border-b-0 border-ink [scrollbar-width:thin] [scrollbar-color:theme(colors.ink)_transparent]" aria-label="Ansichten">
           {images.map((url, i) => (
             <li key={url} className="shrink-0 w-24 small:w-32 snap-start bg-segel border-r border-ink">
               <button
