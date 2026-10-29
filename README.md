@@ -79,6 +79,8 @@ ist wieder kaufbar.
 Beschreibung sind echt, der Preis ist ein Platzhalter. Bei 002–006 ist nur das erste Foto echt;
 die weiteren Ansichten sind mit Codex KI-generiert, der Shop weist unter der Galerie darauf hin
 (Metadatum `ki_ansichten: true`). Vor einem echten Verkauf durch echte Fotos ersetzen.
+Geänderte Fotos in `assets/` übernimmt `npx medusa exec ./src/scripts/update-bag-photos.ts`
+(in `apps/backend`) für bereits angelegte Beispieltaschen; das Seed selbst lässt sie unverändert.
 Preis im Admin ersetzen oder das Produkt löschen. Ein gelöschtes
 Beispielprodukt legt `npm run setup` nicht erneut an. Die Kennzeichnung „Beispiel“ und
 „Demo-Preis“ hängt am Metadatum `beispiel: true`; für echte Taschen dieses Feld weglassen.

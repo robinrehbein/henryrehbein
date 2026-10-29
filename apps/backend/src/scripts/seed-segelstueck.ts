@@ -68,7 +68,24 @@ const DESCRIPTION = [
   "Handgemacht aus Segelstoff. Jede Tasche ist ein Einzelstück und genau einmal erhältlich.",
 ].join("\n\n")
 
-export type SeedResult = { productId: string; variantId: string; created: boolean }
+/** Uploads the bag's photos from assets/, sorted by file name; the first is the thumbnail. */
+export async function uploadBagImages(container: MedusaContainer, bag: Bag) {
+  const imageDir = path.join(__dirname, "assets", bag.imageDir)
+  const imageFiles = readdirSync(imageDir).filter((f) => f.endsWith(".jpg")).sort()
+  const { result: files } = await uploadFilesWorkflow(container).run({
+    input: {
+      files: imageFiles.map((f) => ({
+        filename: `${bag.handle}-${f}`,
+        mimeType: "image/jpeg",
+        content: readFileSync(path.join(imageDir, f)).toString("base64"),
+        access: "public" as const,
+      })),
+    },
+  })
+  return files
+}
+
+export type SeedResult ={ productId: string; variantId: string; created: boolean }
 
 /** Seeds every bag of the catalogue; returns the result for Segeltasche 001. */
 export async function seedSegelstueck(container: MedusaContainer): Promise<SeedResult> {
@@ -126,18 +143,7 @@ async function seedBag(container: MedusaContainer, bag: Bag): Promise<SeedResult
     )
   }
 
-  const imageDir = path.join(__dirname, "assets", bag.imageDir)
-  const imageFiles = readdirSync(imageDir).filter((f) => f.endsWith(".jpg")).sort()
-  const { result: files } = await uploadFilesWorkflow(container).run({
-    input: {
-      files: imageFiles.map((f) => ({
-        filename: `${bag.handle}-${f}`,
-        mimeType: "image/jpeg",
-        content: readFileSync(path.join(imageDir, f)).toString("base64"),
-        access: "public" as const,
-      })),
-    },
-  })
+  const files = await uploadBagImages(container, bag)
 
   const {
     result: [product],
