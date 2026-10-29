@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: "%s | Segelstück",
   },
   description:
-    "Handgemachte Taschen aus Segelstoff. Jede Tasche ist ein Einzelstück. Lokale Demo.",
+    "Handgemachte Taschen aus Segelstoff. Jede Tasche ist ein Einzelstück. Demo-Shop.",
 }
 
 export default function RootLayout(props: { children: React.ReactNode }) {

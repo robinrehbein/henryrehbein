@@ -118,11 +118,12 @@ export default async function initial_data_seed({
     entity: "shipping_profile",
     fields: ["id"],
   })
-  if (!shippingProfiles.length) {
+  let shippingProfileId = shippingProfiles[0]?.id
+  if (!shippingProfileId) {
     const { result } = await createShippingProfilesWorkflow(container).run({
       input: { data: [{ name: "Default Shipping Profile", type: "default" }] },
     })
-    shippingProfiles.push(...result)
+    shippingProfileId = result[0].id
   }
 
   const fulfillmentSet = await fulfillmentModuleService.createFulfillmentSets({
@@ -148,7 +149,7 @@ export default async function initial_data_seed({
         price_type: "flat",
         provider_id: "manual_manual",
         service_zone_id: fulfillmentSet.service_zones[0].id,
-        shipping_profile_id: shippingProfiles[0].id,
+        shipping_profile_id: shippingProfileId,
         type: {
           label: "Testversand",
           description: "Demo: Es wird nichts verschickt.",

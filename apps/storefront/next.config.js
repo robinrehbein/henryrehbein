@@ -9,6 +9,13 @@ const S3_HOSTNAME = process.env.MEDUSA_CLOUD_S3_HOSTNAME
 const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
 
 /**
+ * Public backend host serving uploaded product photos in a deployment.
+ */
+const MEDUSA_PUBLIC_URL = process.env.MEDUSA_PUBLIC_URL
+  ? new URL(process.env.MEDUSA_PUBLIC_URL)
+  : null
+
+/**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
@@ -55,6 +62,14 @@ const nextConfig = {
         protocol: "http",
         hostname: "localhost",
       },
+      ...(MEDUSA_PUBLIC_URL
+        ? [
+            {
+              protocol: MEDUSA_PUBLIC_URL.protocol.replace(":", ""),
+              hostname: MEDUSA_PUBLIC_URL.hostname,
+            },
+          ]
+        : []),
       {
         protocol: "https",
         hostname: "*.s3.*.amazonaws.com",

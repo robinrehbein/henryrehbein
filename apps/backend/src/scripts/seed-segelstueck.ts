@@ -28,7 +28,7 @@ export const SEGELSTUECK_SKU = "SS-001"
 const DEMO_PRICE_EUR = 89
 
 const DESCRIPTION = [
-  "Beispielprodukt für die lokale Demo. Preis und Text sind Platzhalter und werden im Admin durch echte Angaben ersetzt.",
+  "Beispielprodukt für die Demo. Preis und Text sind Platzhalter und werden im Admin durch echte Angaben ersetzt.",
   "Handgemachte Tasche aus Segelstoff. Jede Tasche ist ein Einzelstück und genau einmal erhältlich.",
 ].join("\n\n")
 
@@ -71,7 +71,9 @@ export async function seedSegelstueck(container: MedusaContainer): Promise<SeedR
     entity: "stock_location",
     fields: ["id", "sales_channels.id"],
   })
-  const salesChannels = stockLocations.flatMap((l) => l.sales_channels ?? [])
+  const salesChannels = stockLocations
+    .flatMap((l) => l.sales_channels ?? [])
+    .filter((sc): sc is NonNullable<typeof sc> => !!sc)
   if (!salesChannels.length || !shippingProfiles.length || !stockLocations.length) {
     throw new MedusaError(
       MedusaError.Types.NOT_FOUND,
@@ -103,6 +105,10 @@ export async function seedSegelstueck(container: MedusaContainer): Promise<SeedR
           handle: SEGELSTUECK_HANDLE,
           description: DESCRIPTION,
           material: "Segelstoff",
+          // Breite × Höhe × Tiefe in cm, as measured on the bag.
+          width: 30,
+          height: 25,
+          length: 11,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfiles[0].id,
           thumbnail: files[0].url,
@@ -136,7 +142,7 @@ export async function seedSegelstueck(container: MedusaContainer): Promise<SeedR
     input: {
       inventory_levels: [
         {
-          inventory_item_id: variant.inventory_items[0].inventory_item_id,
+          inventory_item_id: variant.inventory_items![0]!.inventory_item_id,
           location_id: stockLocations[0].id,
           stocked_quantity: 1,
         },

@@ -57,10 +57,10 @@ medusaIntegrationTestRunner({
         ],
         filters: { id: variantId },
       })
-      const levels = data[0].inventory_items[0].inventory.location_levels
+      const levels = data[0].inventory_items?.[0]?.inventory?.location_levels ?? []
       return {
-        stocked: levels.reduce((s, l) => s + Number(l.stocked_quantity), 0),
-        reserved: levels.reduce((s, l) => s + Number(l.reserved_quantity), 0),
+        stocked: levels.reduce((s, l) => s + Number(l?.stocked_quantity ?? 0), 0),
+        reserved: levels.reduce((s, l) => s + Number(l?.reserved_quantity ?? 0), 0),
       }
     }
 
@@ -237,6 +237,12 @@ medusaIntegrationTestRunner({
       const productService = container().resolve(Modules.PRODUCT)
       const live = await productService.listProducts({ handle: SEGELSTUECK_HANDLE })
       expect(live).toHaveLength(0)
+    })
+
+    it("hands the storefront container its publishable key without auth", async () => {
+      const { data, status } = await api.get("/segelstueck/storefront-key")
+      expect(status).toEqual(200)
+      expect(data).toEqual({ token: headers["x-publishable-api-key"] })
     })
   },
 })

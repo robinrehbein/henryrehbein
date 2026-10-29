@@ -14,7 +14,7 @@ export default function PolicyPlaceholder({ title }: { title: string }) {
       <div className="border border-ink bg-papier p-8 max-w-2xl">
         <p className="text-lg mb-2">Dieser Text folgt vor einem echten Verkauf.</p>
         <p className="text-ink-soft leading-7 mb-6">
-          Der Shop ist eine lokale Demo. Bestellungen sind Testbestellungen ohne Zahlung und
+          Dieser Shop ist eine Demo. Bestellungen sind Testbestellungen ohne Zahlung und
           ohne Versand, deshalb gibt es hier noch keine verbindlichen Angaben.
         </p>
         <LocalizedClientLink href="/store" className="btn-secondary">

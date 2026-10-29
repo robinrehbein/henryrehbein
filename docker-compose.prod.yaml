@@ -1,0 +1,68 @@
+# Production stack for Coolify (Docker Compose build pack).
+#
+# Coolify generates the SERVICE_PASSWORD_* and SERVICE_HEX_* values on the first
+# deploy and keeps them. Domains are set per service in the Coolify UI:
+#   storefront -> https://by-rehbein.robinrehbein.de:8000
+#   backend    -> https://api.by-rehbein.robinrehbein.de:9000
+# SHOP_URL and API_URL must match those domains (without the port).
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: segelstueck
+      POSTGRES_PASSWORD: ${SERVICE_PASSWORD_POSTGRES}
+      POSTGRES_DB: segelstueck
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U segelstueck -d segelstueck"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://segelstueck:${SERVICE_PASSWORD_POSTGRES}@postgres:5432/segelstueck?sslmode=disable
+      JWT_SECRET: ${SERVICE_HEX_64_JWT}
+      COOKIE_SECRET: ${SERVICE_HEX_64_COOKIE}
+      MEDUSA_PUBLIC_URL: ${API_URL:-https://api.by-rehbein.robinrehbein.de}
+      STORE_CORS: ${SHOP_URL:-https://by-rehbein.robinrehbein.de}
+      ADMIN_CORS: ${API_URL:-https://api.by-rehbein.robinrehbein.de}
+      AUTH_CORS: ${API_URL:-https://api.by-rehbein.robinrehbein.de},${SHOP_URL:-https://by-rehbein.robinrehbein.de}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@by-rehbein.robinrehbein.de}
+      ADMIN_PASSWORD: ${SERVICE_PASSWORD_ADMIN}
+      SEED_EXAMPLE_BAG: ${SEED_EXAMPLE_BAG:-true}
+    volumes:
+      # Photos uploaded in the Admin; without this volume a redeploy loses them.
+      - uploads:/app/apps/backend/.medusa/server/static
+    expose:
+      - "9000"
+
+  storefront:
+    build:
+      context: .
+      dockerfile: apps/storefront/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      MEDUSA_INTERNAL_URL: http://backend:9000
+      MEDUSA_PUBLIC_URL: ${API_URL:-https://api.by-rehbein.robinrehbein.de}
+      NEXT_PUBLIC_BASE_URL: ${SHOP_URL:-https://by-rehbein.robinrehbein.de}
+      NEXT_PUBLIC_DEFAULT_REGION: de
+    expose:
+      - "8000"
+
+volumes:
+  pgdata:
+  uploads:

@@ -33,7 +33,7 @@ export default function Footer() {
         <div className="bg-segel p-6 small:p-8">
           <p className="label text-ink-soft mb-4">Hinweis</p>
           <p className="text-ink-soft leading-7">
-            Dies ist eine lokale Demo. Bestellungen sind Testbestellungen ohne Zahlung
+            Dies ist ein Demo-Shop. Bestellungen sind Testbestellungen ohne Zahlung
             und ohne Versand. Rechtliche Angaben folgen vor einem echten Verkauf.
           </p>
         </div>

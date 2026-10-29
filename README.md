@@ -1,12 +1,13 @@
 # Segelstück – Demo-Shop für Taschen aus Segelstoff
 
-Lokaler, deutschsprachiger Shop für handgemachte Einzelstücke. Medusa 2 als Backend und
+Deutschsprachiger Shop für handgemachte Einzelstücke. Medusa 2 als Backend und
 Verwaltung, Next.js als Shop-Oberfläche, PostgreSQL als Datenbank. „Segelstück“ ist ein
 Arbeitstitel.
 
-> **Nur lokale Demo.** Testzahlung und Testversand, keine echten Zahlungen, kein Versand,
-> keine E-Mails, keine Veröffentlichung. Rechtstexte (Impressum, AGB, Datenschutz) fehlen
-> bewusst und folgen vor einem echten Verkauf.
+> **Nur Demo.** Testzahlung und Testversand, keine echten Zahlungen, kein Versand,
+> keine E-Mails. Rechtstexte (Impressum, AGB, Datenschutz) fehlen bewusst und folgen vor
+> einem echten Verkauf. Läuft der Shop öffentlich (siehe Coolify), gehören Impressum und
+> Datenschutzerklärung trotzdem dazu.
 
 ## Voraussetzungen
 
@@ -89,6 +90,41 @@ Beispielprodukt legt `npm run setup` nicht erneut an. Die Kennzeichnung „Beisp
   mehreren Backend-Instanzen braucht Medusa ein gemeinsames Locking (z. B. Redis); das gehört
   zum späteren Live-Schritt.
 
+## Auf Coolify betreiben
+
+`docker-compose.prod.yaml` startet alles in einem Stack: PostgreSQL, Medusa-Backend mit
+Admin und den Shop. Die Images werden aus diesem Repository gebaut.
+
+1. In Coolify: **+ New → Application → (Public/Private) Repository** wählen, Branch angeben,
+   Build Pack **Docker Compose**, Compose-Pfad `/docker-compose.prod.yaml`.
+2. Domains pro Service eintragen. Die Portangabe sagt Coolify, wohin es weiterleitet:
+   - `storefront`: `https://by-rehbein.robinrehbein.de:8000`
+   - `backend`: `https://api.by-rehbein.robinrehbein.de:9000`
+3. Umgebungsvariablen prüfen (Coolify zeigt sie nach dem Einlesen an):
+   - `SHOP_URL` und `API_URL` stehen standardmäßig auf den beiden Domains oben. Bei anderen
+     Domains beide anpassen, ohne Port.
+   - `ADMIN_EMAIL` ist die Admin-Anmeldung, Standard `admin@by-rehbein.robinrehbein.de`.
+   - `SERVICE_PASSWORD_ADMIN` erzeugt Coolify beim ersten Deploy; das ist das Admin-Passwort.
+     Datenbankpasswort und Schlüssel (`SERVICE_PASSWORD_POSTGRES`, `SERVICE_HEX_64_*`)
+     erzeugt Coolify ebenfalls.
+   - `SEED_EXAMPLE_BAG=false`, wenn die Beispieltasche nicht angelegt werden soll.
+4. **Deploy.** Beim ersten Start migriert das Backend die Datenbank, legt Grundeinrichtung,
+   Beispieltasche und Admin an. Danach holt sich der Shop seinen Publishable Key vom Backend
+   und baut sich; das dauert beim ersten Start einige Minuten.
+5. Admin unter `https://api.by-rehbein.robinrehbein.de/app`, Shop unter
+   `https://by-rehbein.robinrehbein.de`.
+
+Gut zu wissen:
+
+- Der Admin wird nur beim allerersten Start angelegt. Ein später in Coolify geändertes
+  `SERVICE_PASSWORD_ADMIN` ändert das Passwort nicht mehr; das geht im Admin selbst.
+- Hochgeladene Fotos liegen im Volume `uploads`, die Datenbank im Volume `pgdata`. Beide
+  überleben Redeploys; ein Löschen der Volumes löscht Taschen, Bestellungen und Fotos.
+- Der Shop baut sich beim Start, weil der Publishable Key erst nach der Migration existiert.
+  Ein Neustart ohne geänderte Konfiguration startet sofort.
+- Ohne Redis nutzt Medusa In-Memory-Dienste. Für eine einzelne Instanz reicht das; Medusa
+  meldet dazu eine Warnung im Log.
+
 ## Tests und Prüfungen
 
 ```bash
@@ -118,7 +154,6 @@ Testdatenbanken an (`apps/backend/.env.test`, erzeugt aus `.env.test.template`).
 
 ## Bekannte Grenzen
 
-- Kein Git-Remote eingerichtet.
 - Kundenkonten aus dem Starter sind vorhanden, aber nicht verlinkt und nicht übersetzt.
 - Einige unveränderte Starter-Dateien melden Lint-Fehler (`npm run lint` in `apps/storefront`).
 - Regionen werden in der Storefront zwischengespeichert. Nach Änderungen an Regionen im Admin

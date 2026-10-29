@@ -1,0 +1,15 @@
+**/node_modules
+**/.env
+**/.env.*
+!**/.env.template
+!**/.env.test.template
+.git
+.local
+.superpowers
+.turbo
+**/.turbo
+docs
+apps/backend/.medusa
+apps/backend/static
+apps/storefront/.next
+apps/storefront/tsconfig.tsbuildinfo
