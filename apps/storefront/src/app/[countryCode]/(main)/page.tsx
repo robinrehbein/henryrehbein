@@ -10,6 +10,8 @@ import SectionHeading from "@modules/segel/components/section-heading"
 
 export const dynamic = "force-dynamic"
 
+const HERO_BAG_HANDLE = "segelstueck-001"
+
 export const metadata: Metadata = {
   title: { absolute: "Segelstück – Taschen aus Segelstoff" },
   description: "Handgemachte Taschen aus Segelstoff. Jede Tasche ist ein Einzelstück.",
@@ -38,31 +40,30 @@ export default async function Home(props: { params: Promise<{ countryCode: strin
   const result = await listBags(countryCode)
 
   const available = result.ok ? result.bags.filter((b) => !isBagSold(b)) : []
-  const heroBag = result.ok ? available[0] ?? result.bags[0] : undefined
+  // The hero photo (public/hero.jpg) shows this bag; link it while it exists.
+  const heroBag = result.ok ? result.bags.find((b) => b.handle === HERO_BAG_HANDLE) : undefined
 
   return (
     <>
       <section className="border-b border-ink">
         <div className="content-container !px-0 grid grid-cols-1 small:grid-cols-2 small:border-x border-ink">
           <div className="relative aspect-[4/5] small:aspect-auto small:min-h-[640px] bg-papier border-b small:border-b-0 small:border-r border-ink">
-            {heroBag?.thumbnail ? (
-              <Image
-                src={heroBag.thumbnail}
-                alt={heroBag.title ?? "Tasche aus Segelstoff"}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
-              />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center label text-ink-soft">
-                Noch kein Taschenbild
-              </div>
-            )}
+            <Image
+              src="/hero.jpg"
+              alt="Segeltasche aus weißem Segelstoff mit blauem Motiv und beigem Gurt"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              // The bag sits slightly left of centre in the photo.
+              className="object-cover object-[42%_50%]"
+            />
             {heroBag && (
-              <span className="absolute bottom-4 left-4 label bg-segel border border-ink px-2 py-1">
+              <LocalizedClientLink
+                href={`/products/${heroBag.handle}`}
+                className="absolute bottom-4 left-4 label bg-segel border border-ink px-2 py-1 hover:bg-ink hover:text-segel"
+              >
                 {bagNumber(heroBag) ? `Nr. ${bagNumber(heroBag)}` : heroBag.title}
-              </span>
+              </LocalizedClientLink>
             )}
           </div>
           <div className="flex flex-col justify-between gap-10 p-6 small:p-12">
